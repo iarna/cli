@@ -14,5 +14,7 @@
     "update-notifier": "^2.2.0",
     "yargs": "^8.0.2"
   },
-  "files": [ "app.js" ]
+  "files": [
+    "app.js"
+  ]
 }
