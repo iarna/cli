@@ -10,10 +10,14 @@ const mainPath = path.resolve(require.main.paths[0], '..')
 module.exports = function (entry) {
   let started = false
   let exited = false
-  onExit(() => {
+  onExit((code, signal) => {
     if (started && !exited) {
-      console.error('Abnormal exit: Promises not resolved')
-      process.exit(1)
+      if (signal) {
+        console.error('Abnormal exit:', signal)
+      } else {
+        console.error('Abnormal exit: Promises not resolved')
+      }
+      process.exit(code || 1)
     }
   })
   fs.readFile(mainPath + '/package.json', (err, data) => {
