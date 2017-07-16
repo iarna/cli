@@ -87,10 +87,10 @@ wanted to stop.  =D
 
 ### require('@iarna/cli')(entryPointFunction) → yargs
 
-The module itself returns a function that you need to call with the name of
-your main function.  This is the top level function of your program that
-should return a promise, that when resolved indicates that your program is
-complete.
+The module itself exports a function that you need to call with the name of
+your main function.  Your main function is like `main` in C, it's the entry
+point for your program.  It needs to return a promise that resolves when
+your program completes.
 
 Your entry point function can be named anything, but it needs to return a
 promise and it takes arguments like this:
