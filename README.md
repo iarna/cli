@@ -4,19 +4,58 @@ Some simple CLI scaffolding for promise returning applications.
 
 ## EXAMPLE
 
-```
+`example.js`
+```js
 require('@iarna/cli')(main)
   .boolean('silent')
   .boolean('exit')
+  .boolean('error')
+  .boolean('reject')
   .version()
   .help()
 
 function main (opts, arg1, arg2, arg3) {
   if (!opts.silent) console.error('Starting up!')
   console.log('Got:', arg1, arg2, arg3)
+  if (opts.exit) process.exit()
   if (opts.error) throw new Error('throw')
+  if (opts.reject) return Promise.reject(new Error('reject'))
   return new Promise(resolve => setTimeout(resolve, 10000))
 }
+```
+
+```console
+$ node example hello there world
+Starting up!
+Got: hello there world
+$ node example hello there world
+Starting up!
+Got: hello there world
+^C
+Abnormal exit: SIGINT
+$ node example --silent hello there world
+Got: hello there world
+$ node example --silent hello there world --exit
+Got: hello there world
+Abnormal exit: Promises not resolved
+$ node example --silent hello there world --error
+Abnormal exit: Promises not resolved
+Got: hello there world
+Error: throw
+    at main (/Users/rebecca/code/cli/example.js:11:25)
+    at Immediate.setImmediate (/Users/rebecca/code/cli/app.js:38:32)
+    at runCallback (timers.js:800:20)
+    at tryOnImmediate (timers.js:762:5)
+    at processImmediate [as _immediateCallback] (timers.js:733:5)
+$ node example --silent hello there world --reject
+Got: hello there world
+Error: reject
+    at main (/Users/rebecca/code/cli/example.js:12:42)
+    at Immediate.setImmediate [as _onImmediate] (/Users/rebecca/code/cli/app.js:38:32)
+    at runCallback (timers.js:800:20)
+    at tryOnImmediate (timers.js:762:5)
+    at processImmediate [as _immediateCallback] (timers.js:733:5)
+$
 ```
 
 ## WHAT YOU GET
@@ -53,7 +92,8 @@ your main function.  This is the top level function of your program that
 should return a promise, that when resolved indicates that your program is
 complete.
 
-Your entry point function should look like this:
+Your entry point function can be named anything, but it needs to return a
+promise and it takes arguments like this:
 
 `main(opts, arg1, arg2, …, argn) → Promise`
 
