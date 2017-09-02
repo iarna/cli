@@ -1,6 +1,5 @@
 'use strict'
 const onExit = require('signal-exit')
-const updateNotifier = require('update-notifier');
 const yargs = require('yargs')
 const path = require('path')
 const fs = require('fs')
@@ -27,7 +26,10 @@ module.exports = function (entry) {
       let isInPackage = typeof pkg.bin === 'string'
         ? nameMatch.test(pkg.bin)
         : Object.keys(pkg.bin).some(b => nameMatch.test(b) || nameMatch.test(pkg.bin[b]))
-      if (isInPackage) updateNotifier({pkg: pkg}).notify()
+      if (isInPackage) {
+        const updateNotifier = require('update-notifier');
+        updateNotifier({pkg: pkg}).notify()
+      }
     } catch (ex) { /* don't care */ }
   })
 
