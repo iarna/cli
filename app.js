@@ -45,7 +45,11 @@ module.exports = function (entry) {
     }
     function onError (err) {
       exited = true
-      console.error(err && err.stack ? err.stack : err)
+      if (typeof err === 'number') {
+        process.exit(err)
+      } else if (err) {
+        console.error(err && err.stack ? err.stack : err)
+      }
       process.exit(1)
     }
   })

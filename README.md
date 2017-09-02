@@ -11,6 +11,7 @@ require('@iarna/cli')(main)
   .boolean('exit')
   .boolean('error')
   .boolean('reject')
+  .boolean('code50')
   .version()
   .help()
 
@@ -20,6 +21,7 @@ function main (opts, arg1, arg2, arg3) {
   if (opts.exit) process.exit()
   if (opts.error) throw new Error('throw')
   if (opts.reject) return Promise.reject(new Error('reject'))
+  if (opts.code50) return Promise.reject(50)
   return new Promise(resolve => setTimeout(resolve, 10000))
 }
 ```
@@ -39,7 +41,6 @@ $ node example --silent hello there world --exit
 Got: hello there world
 Abnormal exit: Promises not resolved
 $ node example --silent hello there world --error
-Abnormal exit: Promises not resolved
 Got: hello there world
 Error: throw
     at main (/Users/rebecca/code/cli/example.js:11:25)
@@ -55,7 +56,10 @@ Error: reject
     at runCallback (timers.js:800:20)
     at tryOnImmediate (timers.js:762:5)
     at processImmediate [as _immediateCallback] (timers.js:733:5)
-$
+$ node example --silent hello there world --code50
+Got: hello there world
+$ echo $?
+50
 ```
 
 ## WHAT YOU GET
