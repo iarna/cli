@@ -24,6 +24,9 @@ function main (opts, arg1, arg2, arg3) {
   if (opts.code50) return Promise.reject(50)
   return new Promise(resolve => setTimeout(resolve, 10000))
 }
+
+// alternatively use:
+// function main (opts, ...args) {
 ```
 
 ```console
