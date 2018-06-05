@@ -1,6 +1,5 @@
 'use strict'
 const onExit = require('signal-exit')
-const yargs = require('yargs')
 const path = require('path')
 const fs = require('fs')
 const binName = path.basename(require.main.filename, '.js')
@@ -33,11 +32,42 @@ module.exports = function (entry) {
     } catch (ex) { /* don't care */ }
   })
 
+  let yargs
+  let opts
+  let argv
+  try {
+    yargs = require('yargs')
+    opts = yargs.argv
+    argv = opts._
+  } catch (_) {
+    argv = process.argv.slice(2)
+    opts = {_: argv}
+    if (global.Proxy) {
+      const noYargs = () => {
+        throw new Error('Argument parsing is not available (could not find yargs), to install run: npm i yargs')
+      }
+      yargs = new Proxy({}, {
+        getPrototypeOf: noYargs,
+        setPrototypeOf: noYargs,
+        isExtensible: noYargs,
+        preventExtensions: noYargs,
+        getOwnPropertyDescriptor: noYargs,
+        defineProperty: noYargs,
+        has: noYargs,
+        get: noYargs,
+        set: noYargs,
+        deleteProperty: noYargs,
+        ownKeys: noYargs,
+        apply: noYargs,
+        construct: noYargs
+      })
+
+    }
+  }
   setImmediate(() => {
-    const argv = yargs.argv
     started = true
     try {
-      const appPromise = entry.apply(null, [argv].concat(argv._))
+      const appPromise = entry.apply(null, [opts].concat(argv))
       if (!appPromise || !appPromise.then) {
         return onError(new Error('Error: Application entry point' + (entry.name ? ` (${entry.name})` : '') + ' did not return a promise.'))
       }
