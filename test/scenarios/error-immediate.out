@@ -1,0 +1,3 @@
+started
+Error: boom
+    at main (scenarios/error-immediate.js:)

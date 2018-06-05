@@ -1,0 +1,3 @@
+started
+TypeError: Cannot set property 'example' of undefined
+    at main (scenarios/error-runtime-deferred.js:)

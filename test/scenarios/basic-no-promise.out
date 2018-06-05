@@ -1,0 +1,4 @@
+started
+finished
+Error: Error: Application entry point (main) did not return a promise.
+    at Immediate.setImmediate [as _onImmediate] (app.js:)
