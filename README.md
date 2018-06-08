@@ -2,6 +2,8 @@
 
 Some simple CLI scaffolding for promise returning applications.
 
+![Travis](https://travis-ci.com/iarna/cli.svg?branch=latest)
+
 ## EXAMPLE
 
 ### Without Yargs
