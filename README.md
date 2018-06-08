@@ -4,6 +4,30 @@ Some simple CLI scaffolding for promise returning applications.
 
 ## EXAMPLE
 
+### Without Yargs
+
+If you don't have yargs installed as a dependency then you get arguments
+split out but no option parsing:
+
+`example.js`
+```js
+require('@iarna/cli')(main)
+
+const util = require('util');
+const sleep = util.promisify(setTimeout);
+
+// opts will only contain the _ var, for compatibility with yargs
+async function main (opts, arg1, arg2, arg3) {
+  console.log('Got:', arg1, arg2, arg3)
+  await sleep(40)
+}
+```
+
+### With Yargs
+
+If you do have yargs installed as a dependency you can customize it further
+by chaining off the require in the usual yargsish way.
+
 `example.js`
 ```js
 require('@iarna/cli')(main)
@@ -15,6 +39,9 @@ require('@iarna/cli')(main)
   .version()
   .help()
 
+const util = require('util');
+const sleep = util.promisify(setTimeout);
+
 function main (opts, arg1, arg2, arg3) {
   if (!opts.silent) console.error('Starting up!')
   console.log('Got:', arg1, arg2, arg3)
@@ -22,7 +49,7 @@ function main (opts, arg1, arg2, arg3) {
   if (opts.error) throw new Error('throw')
   if (opts.reject) return Promise.reject(new Error('reject'))
   if (opts.code50) return Promise.reject(50)
-  return new Promise(resolve => setTimeout(resolve, 10000))
+  return sleep(10000)
 }
 
 // alternatively use:
@@ -67,21 +94,23 @@ $ echo $?
 
 ## WHAT YOU GET
 
-* `yargs` - The wrapper around the main function returns a yargs object, so
-  you can configure it as usual.  The `argv` object is passed in as the
-  first argument of your entry point function.  The rest of your positional
-  arguments are passed in as the remaining function arguments.
 * _exit without resolving warnings_ - If your program finishes without
   resolving its promises (like if it crashes hard or you process.exit, or you just don't resolve the promise ) then
   we warn about that.
-* `update-notifier` - A default update notifier is setup for your app so
-  users will learn about new versions when you publish them. Your app needs to
-  have a name, version and bin entry in its `package.json`. (The bin entry
-  needs to have the script using `@iarna/cli` in it for the update notifier
-  to trigger.)
 * If your entry point function rejects then that's reported with a stack
   trace (if the rejected value has `.stack`) else with the rejected value
   and your process will exit with an error code.
+* If you add `yargs` as a dependency then it will be taken advantage of.
+  The wrapper around the main function returns a yargs object, so you can
+  configure it as usual.  The `argv` object is passed in as the first
+  argument of your entry point function.  The rest of your positional
+  arguments are passed in as the remaining function arguments.
+* If you add `update-notifier` as a dependency then it will be taken
+  advantage of.  A default update notifier is setup for your app so users
+  will learn about new versions when you publish them.  Your app needs to
+  have a name, version and bin entry in its `package.json`.  (The bin entry
+  needs to have the script using `@iarna/cli` in it for the update notifier
+  to trigger.)
 
 ## WHAT ITS NOT
 
@@ -90,19 +119,34 @@ handling pretty fast if this is anything beyond a little one off.  This
 mostly exists to scratch my own itch.  I kept on writing this code and I
 wanted to stop.  =D
 
+It's designed to be only be as heavy as it needs to be.  It only has one
+direct dependency, but it can provide enhanced functionality if you depend on
+`yargs` or `update-notifier`.
+
 ## USAGE
 
-### require('@iarna/cli')(entryPointFunction) → yargs
+### require('@iarna/cli')(entryPointFunction) → [yargs]
 
 The module itself exports a function that you need to call with the name of
 your main function.  Your main function is like `main` in C, it's the entry
 point for your program.  It needs to return a promise that resolves when
 your program completes.
 
+The return value from the call is, if you have `yargs` installed, a `yargs`
+object you can use to configure what options your script takes. If you
+don't have yargs installed then it's a proxy that throws if you try to do
+anything with it.
+
 Your entry point function can be named anything, but it needs to return a
 promise and it takes arguments like this:
 
 `main(opts, arg1, arg2, …, argn) → Promise`
 
-The first `opts` argument is `yargs.argv` and the additional arguments are
-from `argv._`, so `arg1 === argv._[0]`, `arg2 === argv._[1]` and so on.
+If you have `yargs` installed then the `opts` argument is `yargs.argv`
+and the additional arguments are from `argv._`, so `arg1 === argv._[0]`,
+`arg2 === argv._[1]` and so on.
+
+If you don't have `yargs` installed then `opts` argument is an object with
+an `_` property containing all arguments, for compatibility with the `yargs`
+mode.  As with that mode `arg1 === argv._[0]`, `arg2 === argv._[1]` and so
+on.
