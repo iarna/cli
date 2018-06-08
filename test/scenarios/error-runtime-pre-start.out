@@ -4,3 +4,4 @@ main.test.example = 'will explode'
 
 TypeError: Cannot set property 'example' of undefined
     at Object.<anonymous> (scenarios/error-runtime-pre-start.js:)
+1

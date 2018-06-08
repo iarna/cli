@@ -3,8 +3,6 @@ require('../..')(main)
 
 function main () {
   console.log('started')
+  throw new Error('boom')
   console.log('finished')
-  return Promise.resolve()
 }
-
-main.test.example = 'will explode'

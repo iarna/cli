@@ -1,0 +1,7 @@
+{
+  "name": "basic-promise-nonotify.js",
+  "version": "1.0.0",
+  "bin": {
+    "index": "index.js"
+  }
+}

@@ -5,9 +5,10 @@ function defer () {
   return new Promise(r => setImmediate(r))
 }
 
-async function main () {
+function main () {
   console.log('started')
-  await defer() 
-  main.test.example = 'will explode'
-  console.log('finished')
+  return defer().then(() => {
+    main.test.example = 'will explode'
+    console.log('finished')
+  })
 }

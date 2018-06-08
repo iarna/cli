@@ -1,0 +1,4 @@
+started
+Error: boom
+    at main (scenarios/error-throws.js:)
+1

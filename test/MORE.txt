@@ -1,0 +1,6 @@
+exit with signal
+exit w/o promises resolved
+isInPackage
+update-notifier
+non-async entry point throws
+throw number

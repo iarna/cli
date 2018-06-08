@@ -10,7 +10,10 @@ module.exports = function (entry) {
   let exited = false
   onExit((code, signal) => {
     if (started && !exited) {
+      // tested, but exit mechanism can't collect coverage
+      /* istanbul ignore next */
       if (signal) {
+        /* istanbul ignore next */
         console.error('Abnormal exit:', signal)
       } else {
         console.error('Abnormal exit: Promises not resolved')
@@ -24,8 +27,10 @@ module.exports = function (entry) {
       const nameMatch = new RegExp(binName, 'i')
       let isInPackage = typeof pkg.bin === 'string'
         ? nameMatch.test(pkg.bin)
-        : Object.keys(pkg.bin).some(b => nameMatch.test(b) || nameMatch.test(pkg.bin[b]))
+        : pkg.bin && Object.keys(pkg.bin).some(b => nameMatch.test(b) || nameMatch.test(pkg.bin[b]))
       if (isInPackage) {
+        /* istanbul ignore next */
+        if (global['NO_NOTIFIER']) throw new Error('NO NOTIFIER')
         const updateNotifier = require('update-notifier');
         updateNotifier({pkg: pkg}).notify()
       }
@@ -36,40 +41,41 @@ module.exports = function (entry) {
   let opts
   let argv
   try {
+    /* istanbul ignore next */
+    if (global['NO_YARGS']) throw new Error('NO YARGS')
     yargs = require('yargs')
     opts = yargs.argv
     argv = opts._
   } catch (_) {
     argv = process.argv.slice(2)
     opts = {_: argv}
-    if (global.Proxy) {
-      const noYargs = () => {
-        throw new Error('Argument parsing is not available (could not find yargs), to install run: npm i yargs')
-      }
-      yargs = new Proxy({}, {
-        getPrototypeOf: noYargs,
-        setPrototypeOf: noYargs,
-        isExtensible: noYargs,
-        preventExtensions: noYargs,
-        getOwnPropertyDescriptor: noYargs,
-        defineProperty: noYargs,
-        has: noYargs,
-        get: noYargs,
-        set: noYargs,
-        deleteProperty: noYargs,
-        ownKeys: noYargs,
-        apply: noYargs,
-        construct: noYargs
-      })
-
+    const noYargs = () => {
+      throw new Error('Argument parsing is not available (could not find yargs), to install run: npm i yargs')
     }
+    // only missing on v4, which has incomplete coverage anyway
+    /* istanbul ignore next */
+    yargs = global.Proxy && new global.Proxy({}, {
+      getPrototypeOf: noYargs,
+      setPrototypeOf: noYargs,
+      isExtensible: noYargs,
+      preventExtensions: noYargs,
+      getOwnPropertyDescriptor: noYargs,
+      defineProperty: noYargs,
+      has: noYargs,
+      get: noYargs,
+      set: noYargs,
+      deleteProperty: noYargs,
+      ownKeys: noYargs,
+      apply: noYargs,
+      construct: noYargs
+    })
   }
   setImmediate(() => {
     started = true
     try {
       const appPromise = entry.apply(null, [opts].concat(argv))
       if (!appPromise || !appPromise.then) {
-        return onError(new Error('Error: Application entry point' + (entry.name ? ` (${entry.name})` : '') + ' did not return a promise.'))
+        return onError(new Error('Application entry point' + (entry.name ? ` (${entry.name})` : '') + ' did not return a promise.'))
       }
       appPromise.then(() => exited = true, onError)
     } catch (ex) {
@@ -80,7 +86,7 @@ module.exports = function (entry) {
       if (typeof err === 'number') {
         process.exit(err)
       } else if (err) {
-        console.error(err && err.stack ? err.stack : err)
+        console.error((err && err.stack) ? err.stack : err)
       }
       process.exit(1)
     }
