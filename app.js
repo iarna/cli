@@ -37,6 +37,7 @@ module.exports = function (entry) {
     } catch (ex) { /* don't care */ }
   })
 
+  let haveYargs
   let yargs
   let opts
   let argv
@@ -44,8 +45,7 @@ module.exports = function (entry) {
     /* istanbul ignore next */
     if (global['NO_YARGS']) throw new Error('NO YARGS')
     yargs = require('yargs')
-    opts = yargs.argv
-    argv = opts._
+    haveYargs = true
   } catch (_) {
     argv = process.argv.slice(2)
     opts = {_: argv}
@@ -71,6 +71,10 @@ module.exports = function (entry) {
     })
   }
   setImmediate(() => {
+    if (haveYargs) {
+      opts = yargs.argv
+      argv = opts._
+    }
     started = true
     try {
       const appPromise = entry.apply(null, [opts].concat(argv))
