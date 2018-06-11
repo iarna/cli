@@ -2,7 +2,7 @@
 
 Some simple CLI scaffolding for promise returning applications.
 
-![Travis](https://travis-ci.com/iarna/cli.svg?branch=latest)
+[![Coverage Status](https://coveralls.io/repos/github/iarna/cli/badge.svg?branch=latest)](https://coveralls.io/github/iarna/cli?branch=latest)
 
 ## EXAMPLE
 
