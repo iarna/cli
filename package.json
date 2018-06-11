@@ -1,6 +1,6 @@
 {
   "name": "@iarna/cli",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Some simple CLI scaffolding for promise returning applications.",
   "main": "app.js",
   "scripts": {
