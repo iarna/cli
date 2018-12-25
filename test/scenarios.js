@@ -12,7 +12,7 @@ if (!isNode8Up) tests = tests.filter(_ => !/[/]node8-/.test(_))
 if (!isNode6Up) tests = tests.filter(_ => !/[/]node6-/.test(_))
 
 test('scenarios', t => {
-  t.plan(tests.length)
+  t.plan(tests.length * 2)
   return Promise.all(tests.map(scenarioFile => {
     const scenario = path.basename(scenarioFile, '.js')
     const expectedFile = `${path.dirname(scenarioFile)}/${scenario}.out`
@@ -21,9 +21,9 @@ test('scenarios', t => {
       lines = fs.readFileSync(expectedFile, 'utf8').trim().split('\n')
     } catch (_) {}
     const exitStatus = lines.pop()
-    const expected = { exitStatus: exitStatus, lines: lines }
-    return qx`node ${scenarioFile} 2>&1; echo $?`.then(rawResult => {
-      t.like(clean(rawResult), expected, scenario)
+    return qx`node ${scenarioFile} 2>&1; echo $?`.then(clean).then(result => {
+      t.is(result.exitStatus, exitStatus, scenario + ' exitStatus')
+      t.like(result.lines, lines, scenario + ' output')
     })
   }))
 })
