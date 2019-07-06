@@ -2,6 +2,7 @@
 const onExit = require('signal-exit')
 const path = require('path')
 const fs = require('fs')
+const process = require('process')
 const binName = path.basename(require.main.filename, '.js')
 const mainPath = path.resolve(require.main.paths[0], '..')
 
@@ -40,14 +41,22 @@ module.exports = function (entry) {
   let haveYargs
   let yargs
   let opts
-  let argv
+  let argv = process.argv.slice(2)
+  if (process.platform === 'win32') {
+    const glob = require('glob').sync
+    const cwd = process.cwd()
+    const statCache = {}
+    const nonull = true
+    const expandedArgs = []
+    argv.forEach(_ => expandedArgs.push.apply(expandedArgs, glob(_, {cwd, statCache, nonull})))
+    argv = expandedArgs
+  }
   try {
     /* istanbul ignore next */
     if (global['NO_YARGS']) throw new Error('NO YARGS')
-    yargs = require('yargs')
+    yargs = require('yargs')(argv)
     haveYargs = true
   } catch (_) {
-    argv = process.argv.slice(2)
     opts = {_: argv}
     const noYargs = () => {
       throw new Error('Argument parsing is not available (could not find yargs), to install run: npm i yargs')

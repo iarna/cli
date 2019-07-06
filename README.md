@@ -6,11 +6,6 @@ Some simple CLI scaffolding for promise returning applications.
 
 ## EXAMPLE
 
-### Without Yargs
-
-If you don't have yargs installed as a dependency then you get arguments
-split out but no option parsing:
-
 `example.js`
 ```js
 require('@iarna/cli')(main)
@@ -25,10 +20,33 @@ async function main (opts, arg1, arg2, arg3) {
 }
 ```
 
-### With Yargs
+## WHAT YOU GET
 
-If you do have yargs installed as a dependency you can customize it further
-by chaining off the require in the usual yargsish way.
+* Automatic glob parsing on Windows so that your passing `*.foo` works the
+  same on Mac/Linux/Windows.
+* Error detetion and handling:
+  * _exit without resolving warnings_ - If your program finishes without
+    resolving its promises (like if it crashes hard or you process.exit, or
+    you just don't resolve the promise) then we warn about that.
+  * If your entry point function rejects then that's reported with a stack
+    trace (if the rejected value has `.stack`) else with the rejected value
+    and your process will exit with an error code.
+* Optional `yargs` support.  If `yargs` is requirable then it will be used. 
+  The wrapper around the main function returns a yargs object, so you can
+  configure it as usual.  The `argv` object is passed in as the first
+  argument of your entry point function.  The rest of your positional
+  arguments are passed in as the remaining function arguments.
+* Optional `update-notifier` support.  If `update-notifier` is requirable
+  then it will be used.  A default update notifier is setup for your app so
+  users will learn about new versions when you publish them.  Your app needs
+  to have a name, version and bin entry in its `package.json`.  (The bin
+  entry needs to have the script using `@iarna/cli` in it for the update
+  notifier to trigger.)
+
+## With Yargs
+
+If you have yargs installed as a dependency you can customize it further by
+chaining off the require in the usual yargsish way.
 
 `example.js`
 ```js
@@ -93,26 +111,6 @@ Got: hello there world
 $ echo $?
 50
 ```
-
-## WHAT YOU GET
-
-* _exit without resolving warnings_ - If your program finishes without
-  resolving its promises (like if it crashes hard or you process.exit, or you just don't resolve the promise ) then
-  we warn about that.
-* If your entry point function rejects then that's reported with a stack
-  trace (if the rejected value has `.stack`) else with the rejected value
-  and your process will exit with an error code.
-* If you add `yargs` as a dependency then it will be taken advantage of.
-  The wrapper around the main function returns a yargs object, so you can
-  configure it as usual.  The `argv` object is passed in as the first
-  argument of your entry point function.  The rest of your positional
-  arguments are passed in as the remaining function arguments.
-* If you add `update-notifier` as a dependency then it will be taken
-  advantage of.  A default update notifier is setup for your app so users
-  will learn about new versions when you publish them.  Your app needs to
-  have a name, version and bin entry in its `package.json`.  (The bin entry
-  needs to have the script using `@iarna/cli` in it for the update notifier
-  to trigger.)
 
 ## WHAT ITS NOT
 
