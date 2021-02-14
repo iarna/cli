@@ -16,13 +16,16 @@
   "files": [
     "app.js"
   ],
+  "engines": {
+    "node": ">= 10.0.0"
+  },
   "devDependencies": {
     "@perl/qr": "^1.2.0",
     "@perl/qx": "^1.1.0",
     "require-inject": "^1.4.4",
-    "tap": "^14.10.8",
-    "update-notifier": "^4.1.1",
-    "yargs": "^15.4.1"
+    "tap": "^14.11.0",
+    "update-notifier": "^5.1.0",
+    "yargs": "^16.2.0"
   },
   "repository": {
     "type": "git",
