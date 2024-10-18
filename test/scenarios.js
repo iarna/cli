@@ -33,6 +33,9 @@ function clean (out) {
     .replace(/[(][/].*[/](app.js|scenarios[/].*.js):\d+:\d+/g, '($1:')
     .replace(/^[/].*[/](app.js|scenarios[/].*.js):\d+/g, '$1:')
     .replace(/^(?:.|\n)*(Error: Argument parsing)/, '$1')
+    // support multiple node version's error outputs:
+    .replace(/TypeError: Cannot set properties of undefined [(]setting '(.*)'[)]/,
+      `TypeError: Cannot set property '$1' of undefined`)
     .split('\n')
   const exitStatus = lines.pop()
   return { exitStatus: exitStatus, lines: lines }
