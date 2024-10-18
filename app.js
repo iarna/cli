@@ -40,6 +40,8 @@ module.exports = function (entry) {
 
   let haveYargs
   let yargs
+  let haveOptimist
+  let optimist
   let opts
   let argv = process.argv.slice(2)
   if (process.platform === 'win32') {
@@ -78,10 +80,19 @@ module.exports = function (entry) {
       apply: noYargs,
       construct: noYargs
     })
+    try {
+      optimist = require('optimist')
+      haveOptimist = true
+    } catch (_) {
+      /* oh well */
+    }
   }
   setImmediate(() => {
     if (haveYargs) {
       opts = yargs.argv
+      argv = opts._
+    } else if (haveOptimist) {
+      opts = optimist.argv
       argv = opts._
     }
     started = true
