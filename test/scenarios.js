@@ -4,7 +4,8 @@ const path = require('path')
 const test = require('tap').test
 const glob = require('glob').sync
 const qx = require('@perl/qx')
-let tests = glob(`${__dirname}/scenarios/*js`)
+let tests = process.argv.slice(2)
+if (tests.length===0) tests = glob(`${__dirname}/scenarios/*js`)
 
 const isNode8Up = process.versions.modules >= 57
 const isNode6Up = process.versions.modules >= 48
