@@ -14,9 +14,9 @@ module.exports = function (entry) {
   onExit((code, signal) => {
     if (started && !exited) {
       // tested, but exit mechanism can't collect coverage
-      /* istanbul ignore next */
+      /* c8 ignore next */
       if (signal) {
-        /* istanbul ignore next */
+        /* c8 ignore next */
         console.error('Abnormal exit:', signal)
       } else {
         console.error('Abnormal exit: Promises not resolved')
@@ -32,7 +32,6 @@ module.exports = function (entry) {
         ? nameMatch.test(pkg.bin)
         : pkg.bin && Object.keys(pkg.bin).some(b => nameMatch.test(b) || nameMatch.test(pkg.bin[b]))
       if (isInPackage) {
-        /* istanbul ignore next */
         if (global['NO_NOTIFIER']) throw new Error('NO NOTIFIER')
         const updateNotifier = require('update-notifier');
         updateNotifier({pkg: pkg}).notify()
@@ -56,7 +55,6 @@ module.exports = function (entry) {
     argv = expandedArgs
   }
   try {
-    /* istanbul ignore next */
     if (global['NO_YARGS']) throw new Error('NO YARGS')
     yargs = require('yargs')(argv)
     haveYargs = true
@@ -65,41 +63,31 @@ module.exports = function (entry) {
       throw new Error('Argument parsing is not available (could not find yargs), to install run: npm i yargs')
     }
     try {
-      /* istanbul ignore next */
       if (global['NO_MINIMIST']) throw new Error('NO MINIMIST')
       minimist = require('minimist')
       haveMinimist = true
       yargs = {
+      /* c8 ignore start */
         alias: function (key, alias) {
-            /* istanbul ignore next*/
             minimistConfig.alias[key] = alias
-            /* istanbul ignore next*/
             return this
         },
         string: function (key) {
-            /* istanbul ignore next*/
             minimistConfig.string.push(key)
-            /* istanbul ignore next*/
             return this
         },
         boolean: function (key) {
-            /* istanbul ignore next*/
             minimistConfig.boolean.push(key)
-            /* istanbul ignore next*/
             return this
         },
         default: function (key, value) {
-            /* istanbul ignore next*/
             minimistConfig.default[key] = value
-            /* istanbul ignore next*/
             return this
         }
+      /* c8 ignore stop */
       }
     } catch (_) {
-      /* oh well */
-      // only missing on v4, which has incomplete coverage anyway
-      /* istanbul ignore next */
-      yargs = global.Proxy && new global.Proxy({}, {
+      yargs = new global.Proxy({}, {
         getPrototypeOf: noYargs,
         setPrototypeOf: noYargs,
         isExtensible: noYargs,
