@@ -3,8 +3,10 @@ const onExit = require('signal-exit')
 const path = require('path')
 const fs = require('fs')
 const process = require('process')
+const startingWd = process.cwd()
 const binName = path.basename(require.main.filename, '.js')
 const mainPath = path.resolve(require.main.paths[0], '..')
+let argv = process.argv.slice(2)
 
 module.exports = function (entry) {
   let started = false
@@ -40,10 +42,10 @@ module.exports = function (entry) {
 
   let haveYargs
   let yargs
-  let haveOptimist
-  let optimist
-  let opts
-  let argv = process.argv.slice(2)
+  let haveMinimist
+  let minimist
+  let minimistConfig = {alias: {}, string: [], boolean: [], default: {}}
+
   if (process.platform === 'win32') {
     const glob = require('glob').sync
     const cwd = process.cwd()
@@ -59,41 +61,73 @@ module.exports = function (entry) {
     yargs = require('yargs')(argv)
     haveYargs = true
   } catch (_) {
-    opts = {_: argv}
     const noYargs = () => {
       throw new Error('Argument parsing is not available (could not find yargs), to install run: npm i yargs')
     }
-    // only missing on v4, which has incomplete coverage anyway
-    /* istanbul ignore next */
-    yargs = global.Proxy && new global.Proxy({}, {
-      getPrototypeOf: noYargs,
-      setPrototypeOf: noYargs,
-      isExtensible: noYargs,
-      preventExtensions: noYargs,
-      getOwnPropertyDescriptor: noYargs,
-      defineProperty: noYargs,
-      has: noYargs,
-      get: noYargs,
-      set: noYargs,
-      deleteProperty: noYargs,
-      ownKeys: noYargs,
-      apply: noYargs,
-      construct: noYargs
-    })
     try {
-      optimist = require('optimist')
-      haveOptimist = true
+      /* istanbul ignore next */
+      if (global['NO_MINIMIST']) throw new Error('NO MINIMIST')
+      minimist = require('minimist')
+      haveMinimist = true
+      yargs = {
+        alias: function (key, alias) {
+            /* istanbul ignore next*/
+            minimistConfig.alias[key] = alias
+            /* istanbul ignore next*/
+            return this
+        },
+        string: function (key) {
+            /* istanbul ignore next*/
+            minimistConfig.string.push(key)
+            /* istanbul ignore next*/
+            return this
+        },
+        boolean: function (key) {
+            /* istanbul ignore next*/
+            minimistConfig.boolean.push(key)
+            /* istanbul ignore next*/
+            return this
+        },
+        default: function (key, value) {
+            /* istanbul ignore next*/
+            minimistConfig.default[key] = value
+            /* istanbul ignore next*/
+            return this
+        }
+      }
     } catch (_) {
       /* oh well */
+      // only missing on v4, which has incomplete coverage anyway
+      /* istanbul ignore next */
+      yargs = global.Proxy && new global.Proxy({}, {
+        getPrototypeOf: noYargs,
+        setPrototypeOf: noYargs,
+        isExtensible: noYargs,
+        preventExtensions: noYargs,
+        getOwnPropertyDescriptor: noYargs,
+        defineProperty: noYargs,
+        has: noYargs,
+        get: noYargs,
+        set: noYargs,
+        deleteProperty: noYargs,
+        ownKeys: noYargs,
+        apply: noYargs,
+        construct: noYargs
+      })
     }
   }
   setImmediate(() => {
+    let opts
     if (haveYargs) {
       opts = yargs.argv
       argv = opts._
-    } else if (haveOptimist) {
-      opts = optimist.argv
+    } else if (haveMinimist) {
+      opts = minimist(argv, minimistConfig)
+      opts.$0 = path.relative(startingWd,process.argv[1])
       argv = opts._
+    } else {
+      opts = {_: argv}
+      opts.$0 = path.relative(startingWd,process.argv[1])
     }
     started = true
     try {

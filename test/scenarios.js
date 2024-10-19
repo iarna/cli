@@ -22,7 +22,7 @@ test('scenarios', t => {
       lines = fs.readFileSync(expectedFile, 'utf8').trim().split('\n')
     } catch (_) {}
     const exitStatus = lines.pop()
-    return qx`node ${scenarioFile} 2>&1; echo $?`.then(clean).then(result => {
+    return qx`node ${scenarioFile} pos1 -i pos2 --test pos3 2>&1; echo $?`.then(clean).then(result => {
       t.is(result.exitStatus, exitStatus, scenario + ' exitStatus')
       t.like(result.lines, lines, scenario + ' output')
     })
